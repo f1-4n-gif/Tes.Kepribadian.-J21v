@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes Kepribadian - ALFIAN</title>
+    
+
+<script src="https://cdn.tailwindcss.com"></script>
+    
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        /* Custom styles to ensure Inter font is used everywhere */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc; /* Very light blue/off-white background */
+        }
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #93c5fd; /* Soft blue for scrollbar */
+            border-radius: 4px;
+        }
+        .likert-option:hover {
+            transform: scale(1.05);
+            transition: transform 0.1s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-8">
+    <div id="app" class="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-6 sm:p-10 transition-all duration-300">
+
+        
+
+<div id="welcome-page" class="flex flex-col items-center justify-center text-center h-full">
+            <div class="p-4 bg-yellow-100 rounded-full mb-6">
+                
+
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-blue-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.036-.426-.17a.75.75 0 0 0-.472 0L12 20.25l-2.073-.829a.75.75 0 0 0-.472 0l-.426.17A7.5 7.5 0 0 1 7.5 17.25V6.75C7.5 6.27 7.684 5.823 8.005 5.498L12 1.5l3.995 3.998A2.25 2.25 0 0 1 16.5 6.75v10.5c0 .26-.055.514-.16.75l-.426.17Z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-extrabold text-blue-800 mb-2">
+                Tes Kepribadian
+            </h1>
+            <p class="text-lg text-gray-600 mb-10">
+                Pahami diri Anda melalui 5 Dimensi Kepribadian Utama
+            </p>
+            <button id="start-test-btn" class="px-8 py-3 text-xl font-semibold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] active:scale-95">
+                Mulai Tes
+            </button>
+            <p class="mt-12 text-sm text-gray-500 border-t pt-4 w-full">
+                Aplikasi ini dikembangkan oleh <span class="font-medium text-blue-700">ALFIAN - Guru Bimbingan Konseling</span>. &copy; 2024 ( Kab. Manokwari - Papua Barat )
+            </p>
+        </div>
+
+        
+
+<div id="instruction-page" class="hidden flex-col items-center justify-center text-center h-full max-w-lg mx-auto">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6">Isi Data Diri</h2>
+            <p class="text-gray-600 mb-8">Sebelum memulai tes, mohon isi data diri Anda untuk keperluan laporan hasil.</p>
+            
+            <div class="w-full space-y-4 text-left">
+                <div>
+                    <label for="user-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="user-name" placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                </div>
+                <div>
+                    <label for="user-class" class="block text-sm font-medium text-gray-700 mb-1">Kelas/Sekolah</label>
+                    <input type="text" id="user-class" placeholder="Contoh: 9A / SMPN 6 Manokwari" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                </div>
+                <div>
+                    <label for="user-date" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Tes</label>
+                    <input type="date" id="user-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                </div>
+            </div>
+
+            <button id="start-questions-btn" class="mt-8 px-8 py-3 text-xl font-semibold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform active:scale-95 w-full">
+                Lanjut ke Pertanyaan
+            </button>
+        </div>
+
+        
+
+<div id="test-page" class="hidden">
+            <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">Tes Kepribadian Big Five</h2>
+            <div class="mb-4 flex justify-between items-center text-gray-600 font-medium">
+                <span id="question-counter">Pertanyaan 1 dari 30</span>
+                <span id="progress-bar-container" class="w-1/2 h-2 bg-blue-100 rounded-full">
+                    <div id="progress-bar" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </span>
+            </div>
+            
+            <div id="questions-container" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+                
+
+</div>
+
+            <div class="mt-8 pt-4 border-t flex justify-center">
+                <button id="submit-test-btn" class="px-8 py-3 text-xl font-semibold text-white bg-yellow-500 rounded-lg shadow-md hover:bg-yellow-600 transition duration-300 transform active:scale-95" disabled>
+                    Lihat Hasil
+                </button>
+            </div>
+        </div>
+        
+        
+
+<div id="result-page" class="hidden">
+            <h2 class="text-3xl font-bold text-blue-700 mb-2 text-center">Hasil Tes Kepribadian Anda</h2>
+            
+            
+
+<div id="user-info-display" class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-6 text-center text-gray-700">
+                
+
+</div>
+            
+
+<div id="result-content">
+                
+                
+
+<div class="p-4 sm:p-8 bg-blue-50 rounded-xl mb-8 shadow-inner">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4 text-center">Profil 5 Dimensi Kepribadian</h3>
+                    <div class="max-w-md mx-auto h-72">
+                        <canvas id="oceanChart"></canvas>
+                    </div>
+                </div>
+
+                
+
+<div class="space-y-6 text-gray-700">
+                    <h3 class="text-2xl font-bold text-blue-700 border-b pb-2">Ringkasan Kepribadian</h3>
+                    <p id="summary-description" class="text-lg leading-relaxed bg-yellow-50 p-4 rounded-xl border border-yellow-200"></p>
+                    
+                    <div id="detailed-results" class="grid md:grid-cols-2 gap-4">
+                        
+
+</div>
+                </div>
+            </div>
+
+            
+
+<div class="mt-10 flex flex-wrap justify-center gap-4">
+                <button id="download-pdf-btn" class="flex items-center space-x-2 px-6 py-2 text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                      <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.625l-1.841-1.84a.75.75 0 1 0-1.06 1.06l3.056 3.055a.75.75 0 0 0 1.06 0l3.056-3.055a.75.75 0 1 0-1.06-1.06L10.75 11.375V2.75Z" />
+                      <path d="M4.625 10.25a.75.75 0 0 0 0 1.5h.375a.75.75 0 0 0 .75-.75v-1a.75.75 0 0 0-1.5 0v1h-.375Z" />
+                      <path d="M4 12.25a.75.75 0 0 0 0 1.5h.375v2.5A1.75 1.75 0 0 0 6.125 18h7.75A1.75 1.75 0 0 0 15.625 16v-2.25h.375a.75.75 0 0 0 0-1.5H15.5V11a.75.75 0 0 0-1.5 0v1.25H6V11a.75.75 0 0 0-1.5 0v1.25H4Z" />
+                    </svg>
+                    Unduh PDF
+                </button>
+                <button onclick="window.location.reload()" class="flex items-center space-x-2 px-6 py-2 text-gray-700 bg-gray-200 rounded-lg shadow-md hover:bg-gray-300 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                      <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.053l-.886.886a.75.75 0 1 0 1.06 1.06l.885-.885A7 7 0 0 0 18 11.25c0-1.72-.58-3.344-1.618-4.643l-.986-.987a.75.75 0 0 0-1.06 1.06l.987.987A5.5 5.5 0 0 1 15.312 11.424Z" clip-rule="evenodd" />
+                      <path fill-rule="evenodd" d="M3.188 8.576A5.5 5.5 0 0 1 12.39 6.523l.886-.886a.75.75 0 1 0-1.06-1.06l-.885.885A7 7 0 0 0 2 8.75c0 1.72.58 3.344 1.618 4.643l.986.987a.75.75 0 1 0 1.06-1.06l-.987-.987A5.5 5.5 0 0 1 3.188 8.576Z" clip-rule="evenodd" />
+                    </svg>
+                    Ulangi Tes
+                </button>
+                
+
+<button onclick="shareResults()" class="flex items-center space-x-2 px-6 py-2 text-white bg-green-500 rounded-lg shadow-md hover:bg-green-600 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                      <path d="M9.25 13.5A3.25 3.25 0 0 0 12.5 10a3.25 3.25 0 0 0-3.25-3.25V5.5L4.5 9.75l4.75 4.25v-1.5ZM13.5 11.75a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z" />
+                    </svg>
+                    Bagikan Hasil
+                </button>
+            </div>
+        </div>
+        
+    </div>
+
+    
+
+<div id="app-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full text-center">
+            <h4 id="modal-title" class="text-xl font-bold mb-3 text-blue-700">Notifikasi</h4>
+            <p id="modal-message" class="text-gray-600 mb-6"></p>
+            <button onclick="document.getElementById('app-modal').classList.add('hidden');" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Tutup</button>
+        </div>
+    </div>
+
+
+    <script>
+        const app = document.getElementById('app');
+        const welcomePage = document.getElementById('welcome-page');
+        const testPage = document.getElementById('test-page');
+        const resultPage = document.getElementById('result-page');
+        
+        // NEW ELEMENTS for Instruction Page
+        const instructionPage = document.getElementById('instruction-page');
+        const userNameInput = document.getElementById('user-name');
+        const userClassInput = document.getElementById('user-class');
+        const userDateInput = document.getElementById('user-date');
+        const startQuestionsBtn = document.getElementById('start-questions-btn');
+        
+        // NEW ELEMENT for Result Page User Info Display
+        const userInfoDisplay = document.getElementById('user-info-display');
+
+        const questionsContainer = document.getElementById('questions-container');
+        const startTestBtn = document.getElementById('start-test-btn');
+        const submitTestBtn = document.getElementById('submit-test-btn');
+        const questionCounter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const summaryDescription = document.getElementById('summary-description');
+        const detailedResults = document.getElementById('detailed-results');
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+
+        let chartInstance = null;
+        let randomizedQuestions = [];
+        let userAnswers = {}; // { 'q_E1': 5, 'q_A2': 1, ... }
+        let userInfo = { name: '', className: '', date: '' }; // State to store user identity
+        
+        // Data Pertanyaan Big Five (30 total, 6 per dimensi)
+        // type: '+' (skor = pilihan pengguna), '-' (skor = 6 - pilihan pengguna)
+        const ALL_QUESTIONS = [
+            // E: Extraversion (Ekstroversi)
+            { id: 'E1', trait: 'Extraversion', text: "Saya mudah bergaul dan memulai percakapan.", type: '+' },
+            { id: 'E2', trait: 'Extraversion', text: "Saya lebih suka menghabiskan waktu luang sendiri.", type: '-' },
+            { id: 'E3', trait: 'Extraversion', text: "Saya merasa nyaman menjadi pusat perhatian.", type: '+' },
+            { id: 'E4', trait: 'Extraversion', text: "Saya pendiam dan tertutup di lingkungan baru.", type: '-' },
+            { id: 'E5', trait: 'Extraversion', text: "Saya memiliki energi yang tinggi dan aktif.", type: '+' },
+            { id: 'E6', trait: 'Extraversion', text: "Saya menghindari kegiatan sosial yang ramai.", type: '-' },
+
+            // A: Agreeableness (Keramahan)
+            { id: 'A1', trait: 'Agreeableness', text: "Saya selalu mencoba membantu orang lain yang membutuhkan.", type: '+' },
+            { id: 'A2', trait: 'Agreeableness', text: "Saya mudah mengkritik kesalahan orang lain.", type: '-' },
+            { id: 'A3', trait: 'Agreeableness', text: "Saya percaya pada niat baik sebagian besar orang.", type: '+' },
+            { id: 'A4', trait: 'Agreeableness', text: "Saya tidak ragu untuk berdebat jika saya merasa benar.", type: '-' },
+            { id: 'A5', trait: 'Agreeableness', text: "Saya bersikap lembut dan baik hati kepada semua orang.", type: '+' },
+            { id: 'A6', trait: 'Agreeableness', text: "Saya tidak peduli dengan perasaan orang yang tidak saya kenal.", type: '-' },
+            
+            // C: Conscientiousness (Kedisiplinan)
+            { id: 'C1', trait: 'Conscientiousness', text: "Saya selalu menyelesaikan tugas yang saya mulai tepat waktu.", type: '+' },
+            { id: 'C2', trait: 'Conscientiousness', text: "Saya sering menunda-nunda pekerjaan hingga menit terakhir.", type: '-' },
+            { id: 'C3', trait: 'Conscientiousness', text: "Saya terorganisir dan menjaga lingkungan saya rapi.", type: '+' },
+            { id: 'C4', trait: 'Conscientiousness', text: "Saya bertindak impulsif tanpa memikirkan rencana.", type: '-' },
+            { id: 'C5', trait: 'Conscientiousness', text: "Saya teliti dan berhati-hati agar tidak membuat kesalahan.", type: '+' },
+            { id: 'C6', trait: 'Conscientiousness', text: "Saya mudah teralihkan dan sulit fokus pada satu hal.", type: '-' },
+
+            // N: Neuroticism (Stabilitas Emosional - Skor tinggi = tidak stabil/cemas)
+            { id: 'N1', trait: 'Neuroticism', text: "Saya sering merasa cemas dan khawatir tanpa alasan jelas.", type: '+' }, // High score = High N
+            { id: 'N2', trait: 'Neuroticism', text: "Saya mampu tetap tenang dan santai di bawah tekanan.", type: '-' }, // Low score = High N
+            { id: 'N3', trait: 'Neuroticism', text: "Saya mudah merasa murung, sedih, atau putus asa.", type: '+' },
+            { id: 'N4', trait: 'Neuroticism', text: "Saya merasa aman dan nyaman dengan diri sendiri.", type: '-' },
+            { id: 'N5', trait: 'Neuroticism', text: "Saya khawatir berlebihan tentang masa depan.", type: '+' },
+            { id: 'N6', trait: 'Neuroticism', text: "Emosi saya stabil dan mudah dikontrol.", type: '-' },
+
+            // O: Openness (Keterbukaan)
+            { id: 'O1', trait: 'Openness', text: "Saya menikmati pengalaman baru dan ide yang berbeda.", type: '+' },
+            { id: 'O2', trait: 'Openness', text: "Saya lebih suka rutinitas dan menghindari perubahan.", type: '-' },
+            { id: 'O3', trait: 'Openness', text: "Saya memiliki imajinasi yang hidup dan kaya.", type: '+' },
+            { id: 'O4', trait: 'Openness', text: "Saya tidak tertarik pada seni, teori, atau filsafat.", type: '-' },
+            { id: 'O5', trait: 'Openness', text: "Saya sangat penasaran dan suka belajar hal baru.", type: '+' },
+            { id: 'O6', trait: 'Openness', text: "Saya cenderung berpikiran konvensional dan praktis.", type: '-' },
+        ];
+
+        // --- UTILITY FUNCTIONS ---
+
+        /**
+         * Fisher-Yates (Knuth) Shuffle for array randomization.
+         * @param {Array} array 
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('app-modal').classList.remove('hidden');
+            document.getElementById('app-modal').classList.add('flex');
+        }
+        
+        // --- VIEW MANAGEMENT ---
+
+        function switchView(viewId) {
+            welcomePage.classList.add('hidden');
+            instructionPage.classList.add('hidden');
+            testPage.classList.add('hidden');
+            resultPage.classList.add('hidden');
+
+            const viewElement = document.getElementById(viewId);
+            if (viewElement) {
+                viewElement.classList.remove('hidden');
+                viewElement.classList.add('flex', 'flex-col'); // Add flex for consistent layout
+                app.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // --- TEST RENDERING ---
+
+        function renderQuestions() {
+            randomizedQuestions = shuffleArray([...ALL_QUESTIONS]);
+            questionsContainer.innerHTML = '';
+            userAnswers = {};
+            
+            randomizedQuestions.forEach((q, index) => {
+                const questionNumber = index + 1;
+                const element = document.createElement('div');
+                element.className = "p-4 bg-blue-50 rounded-xl shadow border border-blue-200";
+                element.innerHTML = `
+                    <p class="font-semibold text-gray-700 mb-3"><span class="text-blue-600 font-bold">${questionNumber}.</span> ${q.text}</p>
+                    <div class="flex justify-between items-center text-sm font-medium text-gray-500 mt-2">
+                        <span>Sangat Tidak Setuju</span>
+                        <span>Sangat Setuju</span>
+                    </div>
+                    <div class="flex justify-between mt-1 space-x-2">
+                        ${[1, 2, 3, 4, 5].map(score => `
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="q_${q.id}" value="${score}" data-trait="${q.trait}" data-type="${q.type}" class="hidden" required>
+                                <div class="likert-option flex items-center justify-center p-2 rounded-lg bg-white border border-gray-300 text-gray-600 font-bold transition duration-150 ease-in-out hover:bg-yellow-200">
+                                    ${score}
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                questionsContainer.appendChild(element);
+            });
+
+            // Attach event listener to capture answers
+            questionsContainer.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.addEventListener('change', handleAnswerChange);
+            });
+
+            updateQuestionCounterAndProgress();
+        }
+
+        function handleAnswerChange(event) {
+            const input = event.target;
+            const questionName = input.name;
+            const score = parseInt(input.value);
+            userAnswers[questionName] = score;
+
+            // Update UI for the selected option
+            const options = document.querySelectorAll(`input[name="${questionName}"] + div`);
+            options.forEach(div => {
+                div.classList.remove('bg-blue-400', 'text-white', 'border-blue-500');
+                div.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
+            });
+            input.nextElementSibling.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
+            input.nextElementSibling.classList.add('bg-blue-400', 'text-white', 'border-blue-500');
+
+            updateQuestionCounterAndProgress();
+        }
+        
+        function updateQuestionCounterAndProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const totalCount = randomizedQuestions.length;
+            
+            questionCounter.textContent = `Pertanyaan ${answeredCount} dari ${totalCount}`;
+            const progress = (answeredCount / totalCount) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            if (answeredCount === totalCount) {
+                submitTestBtn.disabled = false;
+                submitTestBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                submitTestBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                submitTestBtn.disabled = true;
+                submitTestBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitTestBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+            }
+        }
+        
+        // --- SCORING LOGIC ---
+
+        function calculateScores() {
+            const scores = {
+                Openness: 0,
+                Conscientiousness: 0,
+                Extraversion: 0,
+                Agreeableness: 0,
+                Neuroticism: 0,
+            };
+
+            randomizedQuestions.forEach(q => {
+                const key = `q_${q.id}`;
+                const rawScore = userAnswers[key];
+                
+                if (rawScore === undefined) {
+                    // This should not happen if submission is disabled, but for safety
+                    console.error("Pertanyaan belum terjawab:", key);
+                    return;
+                }
+
+                let finalScore;
+                
+                if (q.type === '+') {
+                    // Positif/Forward: 1 (STS) -> 5 (SS)
+                    finalScore = rawScore;
+                } else {
+                    // Negatif/Reversed: 1 (STS) -> 5 (SS) diubah menjadi 5 (STS) -> 1 (SS)
+                    finalScore = 6 - rawScore;
+                }
+
+                scores[q.trait] += finalScore;
+            });
+            
+            // Normalize scores to a 0-100 scale for better visualization/interpretation
+            // Max score per trait is 6 questions * 5 points = 30
+            const maxScorePerTrait = 30;
+
+            const finalNormalizedScores = {};
+            for (const trait in scores) {
+                finalNormalizedScores[trait] = Math.round((scores[trait] / maxScorePerTrait) * 100);
+            }
+
+            return finalNormalizedScores;
+        }
+        
+        // --- RESULT RENDERING ---
+
+        function showResults(normalizedScores) {
+            switchView('result-page');
+            
+            // NEW: Display User Info at the top of the result page
+            userInfoDisplay.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-center sm:space-x-8 text-sm sm:text-base font-medium">
+                    <p class="mb-1 sm:mb-0"><strong>Nama:</strong> ${userInfo.name}</p>
+                    <p class="mb-1 sm:mb-0"><strong>Kelas/Sekolah:</strong> ${userInfo.className}</p>
+                    <p><strong>Tanggal Tes:</strong> ${userInfo.date}</p>
+                </div>
+            `;
+            
+            // 1. CHART VISUALIZATION
+            const labels = ['Keterbukaan', 'Kedisiplinan', 'Ekstroversi', 'Keramahan', 'Stabilitas Emosional'];
+            const dataValues = [
+                normalizedScores.Openness,
+                normalizedScores.Conscientiousness,
+                normalizedScores.Extraversion,
+                normalizedScores.Agreeableness,
+                normalizedScores.Neuroticism
+            ];
+
+            const ctx = document.getElementById('oceanChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Persentase Skor',
+                        data: dataValues,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)', // Blue-500 with transparency
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(156, 163, 175, 0.4)' },
+                            grid: { color: 'rgba(156, 163, 175, 0.4)' },
+                            pointLabels: { font: { size: 12, weight: 'bold' }, color: '#1F2937' },
+                            min: 0,
+                            max: 100,
+                            ticks: { stepSize: 25, display: false } // Hide ticks, show 0-100 range
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (context) => context.dataset.label + ': ' + context.parsed.r + '%' } }
+                    }
+                }
+            });
+
+            // 2. DESCRIPTIVE SUMMARY
+            renderDescriptiveSummary(normalizedScores);
+
+            // 3. DETAILED RESULTS
+            renderDetailedResults(normalizedScores);
+        }
+
+        function getDescriptiveText(trait, score) {
+            const traitsData = {
+                Openness: {
+                    name: 'Keterbukaan (Openness)',
+                    high: "Anda memiliki imajinasi yang tinggi, penasaran, dan sangat terbuka terhadap ide, seni, serta pengalaman baru. Anda adalah pemikir yang kreatif dan non-konvensional.",
+                    medium: "Anda cukup fleksibel dan menyukai keseimbangan antara rutinitas dan eksplorasi hal baru. Anda terbuka pada ide baru, tetapi tetap menghargai hal-hal yang sudah dikenal.",
+                    low: "Anda lebih menyukai rutinitas, kepraktisan, dan pendekatan yang lebih konvensional. Anda cenderung fokus pada kenyataan saat ini daripada ide-ide abstrak."
+                },
+                Conscientiousness: {
+                    name: 'Kedisiplinan (Conscientiousness)',
+                    high: "Anda sangat terorganisir, bertanggung jawab, dan fokus pada pencapaian tujuan. Anda dikenal sebagai pribadi yang dapat diandalkan, disiplin, dan teliti.",
+                    medium: "Anda cukup disiplin dan terorganisir, tetapi juga bisa bersantai. Anda menyelesaikan tugas, namun mungkin tidak selalu dengan tingkat ketelitian yang sangat tinggi.",
+                    low: "Anda cenderung lebih spontan, fleksibel, dan kurang terikat pada jadwal atau perencanaan yang ketat. Anda mungkin mudah teralihkan dan impulsif."
+                },
+                Extraversion: {
+                    name: 'Ekstroversi (Extraversion)',
+                    high: "Anda adalah pribadi yang aktif, sosial, dan menikmati interaksi dengan orang lain. Anda mendapatkan energi dari kegiatan sosial dan lingkungan yang ramai.",
+                    medium: "Anda adalah seorang Ambivert, artinya Anda nyaman bersosialisasi tetapi juga menghargai waktu sendiri. Anda dapat beradaptasi dengan situasi sosial atau kesendirian.",
+                    low: "Anda adalah pribadi yang lebih tenang dan tertutup, lebih memilih refleksi diri daripada interaksi sosial yang intens. Anda merasa lebih nyaman dalam kelompok kecil atau sendirian."
+                },
+                Agreeableness: {
+                    name: 'Keramahan (Agreeableness)',
+                    high: "Anda adalah orang yang ramah, kooperatif, penuh kasih, dan peduli terhadap perasaan orang lain. Anda cenderung menghindari konflik dan mudah berempati.",
+                    medium: "Anda umumnya baik hati dan bersedia bekerja sama, tetapi Anda juga berani mengungkapkan pendapat atau ketidaksetujuan bila diperlukan.",
+                    low: "Anda cenderung bersikap lebih skeptis, kompetitif, dan fokus pada kepentingan diri sendiri. Anda mungkin kurang fleksibel dan bersedia berdebat untuk keyakinan Anda."
+                },
+                Neuroticism: {
+                    name: 'Stabilitas Emosional (Neuroticism)', // Note: High N = Low Stability
+                    high: "Anda cenderung mengalami emosi negatif yang lebih intens, seperti kecemasan, kekhawatiran, dan perubahan suasana hati. Anda mungkin lebih sensitif terhadap stres.",
+                    medium: "Anda memiliki stabilitas emosional yang cukup baik, namun sesekali masih rentan terhadap stres atau kecemasan. Anda umumnya dapat mengelola emosi Anda.",
+                    low: "Anda memiliki stabilitas emosional yang tinggi. Anda tenang, jarang khawatir, dan mampu menghadapi stres atau kesulitan dengan kepala dingin."
+                }
+            };
+
+            let level;
+            if (score >= 67) {
+                level = 'high';
+            } else if (score >= 34) {
+                level = 'medium';
+            } else {
+                level = 'low';
+            }
+
+            return {
+                name: traitsData[trait].name,
+                description: traitsData[trait][level],
+                level: level.toUpperCase()
+            };
+        }
+
+        function renderDescriptiveSummary(scores) {
+            // Find the highest and lowest traits to create a concise summary
+            const traits = Object.keys(scores);
+            const sortedTraits = traits.sort((a, b) => scores[b] - scores[a]);
+            
+            const highestTrait = sortedTraits[0];
+            const lowestTrait = sortedTraits[traits.length - 1];
+
+            const highestDesc = getDescriptiveText(highestTrait, scores[highestTrait]);
+            const lowestDesc = getDescriptiveText(lowestTrait, scores[lowestTrait]);
+            
+            let summaryText = `Dari hasil tes Anda, terlihat bahwa dimensi kepribadian yang paling menonjol adalah **${highestDesc.name}** dengan skor **${scores[highestTrait]}%**. Ini menunjukkan bahwa Anda cenderung ${highestDesc.description.split('.')[0].toLowerCase()}.`;
+            
+            // Add a note on the area needing attention (lowest score or high neuroticism)
+            if (scores.Neuroticism >= 67) {
+                summaryText += ` Area yang perlu Anda perhatikan adalah **Stabilitas Emosional** Anda yang cukup tinggi (${scores.Neuroticism}%). Ini berarti Anda rentan terhadap stres dan mungkin perlu melatih mekanisme koping.`;
+            } else {
+                summaryText += ` Di sisi lain, dimensi **${lowestDesc.name}** Anda (${scores[lowestTrait]}%) menunjukkan bahwa Anda cenderung ${lowestDesc.description.split('.')[0].toLowerCase()}.`;
+            }
+
+            summaryDescription.innerHTML = summaryText;
+        }
+
+        function renderDetailedResults(scores) {
+            detailedResults.innerHTML = '';
+            const traits = Object.keys(scores);
+
+            traits.forEach(trait => {
+                const score = scores[trait];
+                const data = getDescriptiveText(trait, score);
+
+                let badgeColor = 'bg-gray-200 text-gray-700';
+                if (score >= 67) {
+                    badgeColor = 'bg-green-100 text-green-700';
+                } else if (score >= 34) {
+                    badgeColor = 'bg-yellow-100 text-yellow-700';
+                } else {
+                    badgeColor = 'bg-red-100 text-red-700';
+                }
+                
+                // Adjust colors for Neuroticism (High N is generally negative)
+                if (trait === 'Neuroticism') {
+                    if (score >= 67) { // High N is 'low stability'
+                        badgeColor = 'bg-red-100 text-red-700';
+                    } else if (score >= 34) {
+                        badgeColor = 'bg-yellow-100 text-yellow-700';
+                    } else { // Low N is 'high stability'
+                        badgeColor = 'bg-green-100 text-green-700';
+                    }
+                }
+
+
+                const element = document.createElement('div');
+                element.className = "p-4 border-2 border-blue-200 rounded-xl shadow-sm space-y-2";
+                element.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-lg text-blue-600">${data.name}</h4>
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full ${badgeColor}">${score}%</span>
+                    </div>
+                    <p class="text-sm text-gray-600">${data.description}</p>
+                `;
+                detailedResults.appendChild(element);
+            });
+        }
+        
+        // --- PDF DOWNLOAD FUNCTION ---
+
+        function downloadPDF() {
+            showModal('Sedang Membuat PDF', 'Mohon tunggu, kami sedang menyiapkan laporan hasil tes Anda...');
+            
+            // Use the result-content element for PDF
+            const content = document.getElementById('result-content');
+            
+            // Temporarily hide buttons/non-essential elements for cleaner PDF
+            downloadPdfBtn.style.display = 'none';
+
+            // Ensure the chart is rendered properly before capture (Chart.js needs a moment)
+            setTimeout(() => {
+                const { jsPDF } = window.jspdf;
+                
+                html2canvas(content, { 
+                    scale: 2, // Higher scale for better image quality
+                    useCORS: true 
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 295; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    // Add Title Page / Header
+                    pdf.setFontSize(22);
+                    pdf.setTextColor(59, 130, 246); // Blue
+                    pdf.text("Laporan Hasil Tes Kepribadian", 105, 20, null, null, "center");
+                    
+                    // ADDED USER INFO TO PDF HEADER (using default 10pt font)
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(107, 114, 128); // Gray
+                    
+                    pdf.text(`Nama: ${userInfo.name || 'Anonim'}`, 105, 28, null, null, "center");
+                    pdf.text(`Kelas/Sekolah: ${userInfo.className || '-'}`, 105, 34, null, null, "center");
+                    pdf.text(`Tanggal Tes: ${userInfo.date || new Date().toLocaleDateString('id-ID')}`, 105, 40, null, null, "center");
+
+                    pdf.line(20, 44, 190, 44); // Horizontal line
+                    
+                    // Adjusted position for captured image
+                    position = 50;
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth - 20, imgHeight);
+                    heightLeft -= (pageHeight - position);
+                    
+                    // Handle multi-page content
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight + 10;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth - 20, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    // Add Footer
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(107, 114, 128); // Gray
+                    pdf.text("Aplikasi dikembangkan oleh ALFIAN - Guru BK SMP Negeri 6 Manokwari", 105, 290, null, null, "center");
+
+
+                    pdf.save('Hasil_Tes_Kepribadian.pdf');
+                    document.getElementById('app-modal').classList.add('hidden'); // Close modal
+                    downloadPdfBtn.style.display = 'flex'; // Restore button
+                });
+            }, 500); // Small delay to allow Chart.js to finish drawing
+        }
+        
+        function shareResults() {
+            const scores = calculateScores();
+            const highestTrait = Object.keys(scores).sort((a, b) => scores[b] - scores[a])[0];
+            const summary = getDescriptiveText(highestTrait, scores[highestTrait]);
+            
+            const shareText = `*Hasil Tes Kepribadian Big Five*\n\nNama: ${userInfo.name || 'Anonim'}\nKelas: ${userInfo.className || '-'}\nTanggal Tes: ${userInfo.date || new Date().toLocaleDateString('id-ID')}\n\nDimensi paling menonjol saya adalah ${summary.name} dengan skor ${scores[highestTrait]}%. \n\nCoba tesnya di sini (Link placeholder: https://play.google.com/store/apps/details?id=pt.opt.anda&hl=id)! #TesKepribadian #BigFive #SMPN6Manokwari`;
+            
+            if (navigator.share) {
+                // Use Web Share API if available (mobile/modern browsers)
+                navigator.share({
+                    title: 'Hasil Tes Kepribadian',
+                    text: shareText,
+                    url: window.location.href // Use current URL as placeholder
+                }).catch((error) => console.error('Error sharing', error));
+            } else {
+                // Fallback for desktop/non-supporting browsers (copy to clipboard)
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showModal('Berhasil Disalin!', 'Ringkasan hasil tes telah disalin ke clipboard Anda. Silakan tempel di media sosial.');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showModal('Gagal Menyalin', 'Gagal menyalin ringkasan. Silakan coba salin teks secara manual.');
+                });
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+
+        startTestBtn.addEventListener('click', () => {
+            // Set today's date as default on entry
+            const today = new Date().toISOString().split('T')[0];
+            userDateInput.value = today;
+            switchView('instruction-page');
+        });
+
+        startQuestionsBtn.addEventListener('click', () => {
+            const name = userNameInput.value.trim();
+            const className = userClassInput.value.trim();
+            const date = userDateInput.value;
+
+            if (!name || !className || !date) {
+                showModal('Peringatan!', 'Mohon lengkapi semua data diri (Nama, Kelas/Sekolah, dan Tanggal Tes) sebelum melanjutkan.');
+                return;
+            }
+
+            // Store validated user info
+            userInfo = { 
+                name, 
+                className, 
+                date: new Date(date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) 
+            };
+            
+            renderQuestions();
+            switchView('test-page');
+        });
+
+        submitTestBtn.addEventListener('click', () => {
+            const totalQuestions = randomizedQuestions.length;
+            const answeredQuestions = Object.keys(userAnswers).length;
+
+            if (answeredQuestions < totalQuestions) {
+                showModal('Peringatan!', `Anda harus menjawab semua ${totalQuestions} pertanyaan. Baru ${answeredQuestions} pertanyaan yang terjawab.`);
+                return;
+            }
+            
+            const scores = calculateScores();
+            showResults(scores);
+        });
+        
+        downloadPdfBtn.addEventListener('click', downloadPDF);
+        
+        // Expose share function globally for the button
+        window.shareResults = shareResults;
+        
+        // Initialize the app view
+        window.onload = () => {
+            switchView('welcome-page');
+        }
+    </script>
+</body>
+</html>
